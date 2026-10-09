@@ -1,0 +1,24 @@
+# 🌤️ Weather Information Dashboard
+
+A sleek, responsive, and real-time weather dashboard built using vanilla JavaScript, standard CSS3, and the OpenWeatherMap API.
+
+## 🚀 Live Demo
+- **Live App:** [Insert your GitHub Pages URL here after deploying]
+
+## ✨ Features
+- **Real-Time Weather Data:** Fetches temperature, conditions, humidity, and wind speed for any valid city.
+- **Loading & Error Handling:** Displays active loading indicators during requests and user-friendly error messages for invalid entries.
+- **Geolocation Support:** Retrieves local weather automatically via browser GPS permission.
+- **Recent Search History:** Saves recently searched cities in LocalStorage as quick-search tags.
+- **Dark / Light Mode:** Dynamic theme switcher for optimal visibility across system settings.
+- **Fully Responsive:** Styled using modern CSS Flexbox and media queries for mobile, tablet, and desktop views.
+
+## 🛠️ Tech Stack
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+ / Async-Await / DOM API)
+- **API:** OpenWeatherMap API
+- **Storage:** HTML5 LocalStorage
+
+## 🔧 Local Setup Instructions
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/teja200401/weather-dashboard.git](https://github.com/teja200401/weather-dashboard.git)

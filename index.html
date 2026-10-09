@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Information Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <h1>Weather Information Dashboard</h1>
+      <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
+    </header>
+
+    <!-- Search Section -->
+    <div class="search-box">
+      <input type="text" id="city-input" placeholder="Enter city name..." autocomplete="off">
+      <button id="search-btn">Search</button>
+      <button id="location-btn" title="Use Current Location">📍</button>
+    </div>
+
+    <!-- Recent Searches -->
+    <div id="recent-searches" class="recent-container hidden">
+      <span class="recent-title">Recent:</span>
+      <div id="recent-tags" class="recent-tags"></div>
+    </div>
+
+    <!-- Status & Error Message Container -->
+    <div id="status-message" class="hidden"></div>
+
+    <!-- Weather Display Card -->
+    <div id="weather-card" class="weather-card hidden">
+      <h2 id="city-name">--</h2>
+      <div class="weather-main">
+        <img id="weather-icon" src="" alt="Weather Icon" class="weather-icon">
+        <div id="temperature" class="temp">--°C</div>
+      </div>
+      <p id="condition" class="condition">--</p>
+      
+      <div class="weather-details">
+        <div class="detail-item">
+          <span class="label">Humidity:</span>
+          <span id="humidity" class="value">--%</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Wind Speed:</span>
+          <span id="wind" class="value">-- m/s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
