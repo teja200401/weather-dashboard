@@ -3,7 +3,7 @@
 A sleek, responsive, and real-time weather dashboard built using vanilla JavaScript, standard CSS3, and the OpenWeatherMap API.
 
 ## 🚀 Live Demo
-- **Live App:** [Insert your GitHub Pages URL here after deploying]
+- **Live App:** https://teja200401.github.io/weather-dashboard/
 
 ## ✨ Features
 - **Real-Time Weather Data:** Fetches temperature, conditions, humidity, and wind speed for any valid city.
