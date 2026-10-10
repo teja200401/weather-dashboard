@@ -1,3 +1,4 @@
+// --- DOM Element Selectors ---
 const cityInput = document.getElementById("city-input");
 const searchBtn = document.getElementById("search-btn");
 const locationBtn = document.getElementById("location-btn");
@@ -7,11 +8,13 @@ const weatherCard = document.getElementById("weather-card");
 const recentContainer = document.getElementById("recent-searches");
 const recentTags = document.getElementById("recent-tags");
 
-const API_KEY = "a96f3a1cd19a96254e480dee32ea994e"; // Insert your API Key here
+// --- API Configuration ---
+const API_KEY = "a96f3a1cd19a96254e480dee32ea994e";
 
+// --- State Management ---
 let recentCities = JSON.parse(localStorage.getItem("weather_recent")) || [];
 
-// Event Listeners
+// --- Event Listeners ---
 searchBtn.addEventListener("click", () => handleSearch());
 locationBtn.addEventListener("click", handleGeolocation);
 themeToggle.addEventListener("click", toggleDarkMode);
@@ -19,15 +22,29 @@ cityInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") handleSearch();
 });
 
-// Initial Load
+// --- Initial Load ---
 updateRecentUI();
 
+// Check saved theme preference on load
+if (localStorage.getItem("weather_theme") === "dark") {
+  document.body.classList.add("dark-mode");
+  themeToggle.textContent = "☀️ Light Mode";
+}
+
+// --- Core Search & Geolocation Handlers ---
 function handleSearch(cityName) {
   const city = cityName || cityInput.value.trim();
+  
   if (!city) {
-    showError("Please enter a city name.");
+    showError("Please enter a valid city name.");
     return;
   }
+
+  if (!navigator.onLine) {
+    showError("No internet connection. Please check your network.");
+    return;
+  }
+
   fetchWeatherData(`q=${encodeURIComponent(city)}`, city);
 }
 
@@ -36,48 +53,77 @@ function handleGeolocation() {
     showError("Geolocation is not supported by your browser.");
     return;
   }
-  showLoading();
+
+  if (!navigator.onLine) {
+    showError("No internet connection. Please check your network.");
+    return;
+  }
+
+  showLoading("Detecting your location...");
+  
   navigator.geolocation.getCurrentPosition(
     (position) => {
       const { latitude, longitude } = position.coords;
       fetchWeatherData(`lat=${latitude}&lon=${longitude}`);
     },
-    () => showError("Unable to retrieve location permission.")
+    (error) => {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          showError("Location permission denied. Please search manually.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          showError("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          showError("Location request timed out.");
+          break;
+        default:
+          showError("Unable to retrieve your location.");
+      }
+    },
+    { timeout: 10000 }
   );
 }
 
+// --- API Fetch Function ---
 async function fetchWeatherData(queryParam, cityName = null) {
-  showLoading();
+  showLoading("Fetching weather data...");
+  
   try {
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?${queryParam}&units=metric&appid=${API_KEY}`
     );
 
     if (!response.ok) {
-      if (response.status === 404) throw new Error("City not found.");
-      if (response.status === 401) throw new Error("Invalid API key.");
-      throw new Error("Unable to fetch weather data.");
+      if (response.status === 404) throw new Error("City not found. Please check the spelling.");
+      if (response.status === 401) throw new Error("Invalid API key configuration.");
+      if (response.status === 429) throw new Error("API rate limit exceeded. Try again later.");
+      throw new Error("Unable to fetch weather data. Please try again.");
     }
 
     const data = await response.json();
     displayWeatherData(data);
 
-    if (cityName || data.name) {
-      saveRecentCity(cityName || data.name);
+    const resolvedName = cityName || data.name;
+    if (resolvedName) {
+      saveRecentCity(resolvedName);
     }
   } catch (error) {
     showError(error.message);
   }
 }
 
+// --- Recent Searches Management ---
 function saveRecentCity(city) {
   const formatted = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
-  if (!recentCities.includes(formatted)) {
-    recentCities.unshift(formatted);
-    if (recentCities.length > 3) recentCities.pop(); // Keep top 3
-    localStorage.setItem("weather_recent", JSON.stringify(recentCities));
-    updateRecentUI();
-  }
+  
+  recentCities = recentCities.filter(c => c.toLowerCase() !== formatted.toLowerCase());
+  recentCities.unshift(formatted);
+  
+  if (recentCities.length > 5) recentCities.pop(); // Keep top 5 recent searches
+  
+  localStorage.setItem("weather_recent", JSON.stringify(recentCities));
+  updateRecentUI();
 }
 
 function updateRecentUI() {
@@ -85,6 +131,7 @@ function updateRecentUI() {
     recentContainer.classList.add("hidden");
     return;
   }
+  
   recentTags.innerHTML = "";
   recentCities.forEach((city) => {
     const tag = document.createElement("span");
@@ -93,17 +140,20 @@ function updateRecentUI() {
     tag.addEventListener("click", () => handleSearch(city));
     recentTags.appendChild(tag);
   });
+  
   recentContainer.classList.remove("hidden");
 }
 
+// --- UI & Theme Toggles ---
 function toggleDarkMode() {
   document.body.classList.toggle("dark-mode");
   const isDark = document.body.classList.contains("dark-mode");
   themeToggle.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+  localStorage.setItem("weather_theme", isDark ? "dark" : "light");
 }
 
-function showLoading() {
-  statusMessage.textContent = "Fetching weather data...";
+function showLoading(message = "Loading...") {
+  statusMessage.textContent = message;
   statusMessage.className = "status loading";
   weatherCard.classList.add("hidden");
 }
